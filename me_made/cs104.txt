@@ -291,8 +291,8 @@ class Person {
 • add files to staging area and then commit the changes
 • .gitignore - files which you don't want git to track. Ex:- *.out, *.o, build/{this will ignore build directory in any directory inside the main}, /build/{only ignore build in main dir}
 • status - tells current branch, which files in stage and are yet to commit, which are not tracked - files in gitignore wont show up
-• git add .{all files in ./}, git add *.txt{all txt files}, git add -A{all changes including deletions}
-• git commit{commit the staged snapshot}, git commit -a{commit modifications of all tracked files ie added to staging area at some point}, git commit --amend{change last commit}
+• git add .{all files in ./}, git add *.txt{all txt files}, git add -A{all changes including deletions}, git add -u {stage the deletions}`
+• git commit{commit the staged snapshot}, git commit -a{commit modifications of all tracked files in wor_dir ie added to staging area at some point}, git commit --amend{change last commit}
 • git commit - commits from staging area
 • git commit <file> - puts the files from working dir to staging area and then commits it
 • git log file1.txt - gives commit history of a file
@@ -352,7 +352,8 @@ class Person {
 	Bash does not support floating-point arithmetic natively; use bc (basic calculator) command instead
 		By default, bc performs integer arithmetic; use -l option for float
 		echo "scale=2; 5 / 2" | bc -l  ----  2.50 {default is 20 digits precision ig}
-	Can use declare -i to make a variable integer-only {ex:- declare -i num=5} {if you then do num=er it will ignore it set num to zero} {if you give floating point it will round down ig}
+		echo "a=10; b=3; a/b" | bc -l  ----  a, b are not persisted outside this one bc ses
+	Can use declare -i to make a variable integer-only {ex:- declare -i num; num=9} {if you then do num=er it will ignore it set num to zero} {if you give floating point it will round down ig}
 	num=5*2+1; echo $num  ----  5*2+1
 	let num=5*2+1; echo $num  ----  11
 	echo $[3*2] {deprecated} (or) echo $((3*2) (or) echo "$((3*2))" ----  6  [[btw using qoutes is better if spaces  are there etc]]
@@ -380,6 +381,14 @@ class Person {
         echo "4: Hello, Sunita!"
     else
         echo "4: Hello, Stranger!"
+    fi
+
+----string="Hello, World!"
+    pattern="^Hello"
+    if [[ $string =~ $pattern ]]; then
+	echo "The string starts with 'Hello'."
+    else
+	echo "The string does not start with 'Hello'."
     fi
 
 ----if ls nonexistent_directory &>/dev/null; then
@@ -486,6 +495,107 @@ class Person {
 	Loop Line 3
 	EOF
 • arrays
+	fruits=("Apple" "Banana" "Cherry")
+	fruits[3]="Orange"
+	echo "All Fruits: ${fruits[@]}"    # Print all elements
+	echo "Number of Fruits: ${#fruits[@]}"    # Print the length of the array
+	for fruit in ${fruits[@]}; do
+	    echo "$fruit"
+	done
+	
+	unset fruits[1]
+	
+	declare -A capitals    # Declare an associative array (Requires declare -A)
+	capitals["France"]="Paris"
+	capitals["Japan"]="Tokyo"
+	capitals["USA"]="Washington D.C."
+	capitals["India"]="New Delhi"
+	echo "Countries: ${!capitals[@]}"
+	echo "Capitals: ${capitals[@]}"
+	for country in "${!capitals[@]}"; do
+	    echo "$country - ${capitals[$country]}"
+	done
+	unset capitals["USA"]
+
+-------------------------------------SED-------------------------------------
+
+• sed 'address(es) s/pattern/replacement/[flags]' filename {sed 's/hi/hello/' file.txt}
+• sed -f commands.sed file.txt
+• sed 'ADDRESSd' filename { '1,5d' (delete lines 1 to 5)}
+• sed '/PATTERN/d' filename {'/^$/d' (remove empty lines)}
+• Flags: a number indicating the occurrence, g: global{replace all occurrences of pattern}, p: print contents, I: case insensitive
+• echo "Welcome To The Course CS104" | sed -E 's/(\b[A-Z])/(\1)/g'
+• sed 'ADDRESSp’ filename, sed  '/PATTERN/p' filename {print} - {Often used with the -n option}
+• sed '2a tomato' fruits {adds a new line with text tomato after 2nd line}
+• sed '/aam/a mango' exp.txt {adds a new line with word mango after lines with aam}
+• a-append, i-inserts, c-replace {all same syntax as append}
+• a adds new line after match with content, i puts a line before match, c replaces the whole line
+• sed '5q' fruits (print first 5 lines and quits)
+• sed 's/mango/aam/; s/banana/kela/;' fruits (or) sed -e 's/mango/aam/' -e 's/banana/kela/' fruits
+• Can reference previously captured *groups* that match some regular expression pattern {echo "AA BB DS" | sed -E 's/([A-Z])\1/XX/g' will result in XX XX DS}
+• & is used to reference the entire matched pattern { echo "I have 5 apples and 3 bananas." | sed 's/[0-9]\+/[&]/g' results in "I have [5] apples and [3] bananas"}
+• sed -E 's/[0-9]+/[Age: &]/g' sample.txt {suhas, Alladaboina, 18, Student -> Suhas, Alladaboina, [Age: 18], Student}
+• -i option: modify files
+
+-------------------------------------AWK-------------------------------------
+
+• BEGIN {action}
+  pattern {action}
+  pattern {action}
+  END {action}
+• awk '{print}' file1.txt file2.txt
+• BEGIN { print "List of jpg files:" }
+  /\.jpg$/ { print }
+  END { print "All done!" }
+• $0 represents the entire input line, $1, $2, ... refer to the individual fields
+• NR: Number of records (lines) processed so far
+  NF: Number of fields in the current record
+  FS: Input field separator (default is whitespace), OFS: Output field separator (default is space)
+  RS: Input record separator (default is newline \n), ORS: Output record separator (default is newline \n
+• awk '{
+    # Multiply the second field by 2 and add the first field
+    result = $1 + $2 * 2;
+    print "Sum of first field + second field * 2 = ", result
+}' students.tsv
+• if ($2 >= 30 && $3 == "Engineer") {
+      print $1 " is an Engineer and older than or equal to 30.";
+• if ($1 ~ /^test/) {print match} [[~ for match and !~ for non match]]
+• grades["Amit"] = 85;
+  grades["Priya"] = 92;
+  grades["Raj"] = 78;
+  grades["Neha"] = 95;
+  for (name in grades) {
+      print "Student:", name, "=> Grade:", grades[name];
+  }
+  delete grades["Raj"];
+• length(str), substr(str, 3, 5), index(str, "AWK"), split(str, arr, ","), tolower(str), toupper(str)
+• formatted = sprintf("Formatted number: %.2f", num); print formatted  {Similar to printf, except returns the formatted string as a value}
+• sqrt(x), int(x), sin(x), cos(x)
+• getline name < "-";  {from std input}
+• while (getline line < "fruits") {
+      print "Read line: " line
+  }
+• system("ls"), systime(), ENVIRON["PATH"]
+• {FS=",";OFS="\t"; $1=$1;print} works {OFS="\t"; $1=$1; print $0} works but {OFS="\t"; print $0} doesnt cuz you need to change the $0 for awk to recontruct it or else it stay the original line
+• awk -F, "{print}" students.csv {-F says the feild seperator}
+• awk -v min_age=9 "{if ($1>min_age) {print} }" students.csv {-v is used to pass variables to the script}
+• column -t -s $'\t'
+
+-------------------------------------PYTHON-------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
