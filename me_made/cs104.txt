@@ -529,6 +529,8 @@ class Person {
 • Flags: a number indicating the occurrence, g: global{replace all occurrences of pattern}, p: print contents, I: case insensitive
 • echo "Welcome To The Course CS104" | sed -E 's/(\b[A-Z])/(\1)/g'
 • sed 'ADDRESSp’ filename, sed  '/PATTERN/p' filename {print} - {Often used with the -n option}
+• sed '/mike/!p' {prints everything except lines with mike}
+• sed -En '/^mike/!p' me.txt {prints lies without mike at start}
 • sed '2a tomato' fruits {adds a new line with text tomato after 2nd line}
 • sed '/aam/a mango' exp.txt {adds a new line with word mango after lines with aam}
 • a-append, i-inserts, c-replace {all same syntax as append}
@@ -742,6 +744,8 @@ class Person {
 • np.where([True, False, True])        # (array([0,2]),)
   np.where(a>0, a, 0)                  # replace negatives with 0
   np.argwhere(a>5)         # [[i,j], …] for each element >5
+  asdf[np.isnan(asdf)] = 0.0
+  print(asdf)
 • np.sort([3,1,2])         # [1,2,3]
 • m = np.arange(9).reshape(3,3)
   m.diagonal()             # [0,4,8]
