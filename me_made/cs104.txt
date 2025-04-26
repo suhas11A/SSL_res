@@ -519,6 +519,8 @@ class Person {
 	    echo "$country - ${capitals[$country]}"
 	done
 	unset capitals["USA"]
+	IFS=$'\n' sorted=($(sort <<<"${array[*]}")) {sorts the array, elements can have space in them as long its not a new line}
+	unset IFS
 
 -------------------------------------SED-------------------------------------
 
